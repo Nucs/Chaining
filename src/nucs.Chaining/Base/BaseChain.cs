@@ -273,7 +273,7 @@ namespace nucs.Chaining {
         /// <summary>
         ///     Falls back to previous script/script.
         /// </summary>
-        /// <param name="times">How many stacks to fall.</param>
+        /// <param name="times">How many stages to fall.</param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException">When <paramref name="times"/> exceeds the stacks</exception>
         public TReturnedDelegate Backwards(int times = 1) {
@@ -449,9 +449,10 @@ namespace nucs.Chaining {
             _stagesStack.Clear();
             _stagesStack.Push((Delegate) (object) InitialScript);
 
-            ScriptChanged = null;
             Failed = false;
             Completed = false;
+             
+            //todo when using Bind event from inside of a script, make sure to unregister it when the script is Reset.
 
             _nameDelegates.Clear();
 

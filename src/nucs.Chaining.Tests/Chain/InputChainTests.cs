@@ -30,8 +30,7 @@ namespace nucs.Chaining.Tests {
             var chain = InputChain<int>.Build((c, r) => {
                 return _ => c.Complete();
             });
-
-
+            
             chain.Pulse();
             chain.Cancel();
 

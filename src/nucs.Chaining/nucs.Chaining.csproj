@@ -9,4 +9,9 @@
     <DefineConstants>TRACE;DEBUG;CSHARP73;NETSTANDARD2_0</DefineConstants>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="nucs.Chaining.net4.v3.ncrunchproject" />
+    <None Remove="nucs.Chaining.netstandard1.2.v3.ncrunchproject" />
+  </ItemGroup>
+
 </Project>

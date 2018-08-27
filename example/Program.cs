@@ -20,7 +20,7 @@ namespace nucs.Chaining.Example {
                 Console.WriteLine("Machine initialized;");
 
                 return _1 => {
-                    c.NameScript("Get number"); //names current script root.
+                    c.NameScript("Get number"); //names current script so later we can refer to it.
                     Console.Write("Enter number to call: ");
                     var number = Console.ReadLine();
                     if (number==null || !number.All(Char.IsDigit)) { //if input is not all digits, repeat script on next pulse.
