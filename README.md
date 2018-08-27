@@ -1,2 +1,7 @@
 # Chaining
-A simple library for creating functional state machines in C# code in a single command.
+A simple library for creating functional state machines in C# code in a single command.<br>
+see [example](https://github.com/Nucs/Chaining/blob/master/example/Program.cs) for a quickstart.
+## Features
+* Build complex workflows in a matter of minutes.
+* Ability to access local variables initiated in previous states without hassle.
+* Pulse based machines.
