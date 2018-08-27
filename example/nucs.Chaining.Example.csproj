@@ -50,7 +50,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\nucs.Chaining\nucs.Chaining.csproj">
+    <ProjectReference Include="..\src\nucs.Chaining\nucs.Chaining.csproj">
       <Project>{893fd42a-4e31-483b-977e-7d74a8473895}</Project>
       <Name>nucs.Chaining</Name>
     </ProjectReference>
