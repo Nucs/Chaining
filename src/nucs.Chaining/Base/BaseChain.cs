@@ -20,6 +20,7 @@ namespace nucs.Chaining {
     /// <typeparam name="TDelegate">A delegate or object that can be invoked.</typeparam>
     /// <typeparam name="TReturnedDelegate">A delegate or object that can be invoked and is returned from <typeparamref name="TDelegate"/>, note: can be the same as <typeparamref name="TDelegate"/></typeparam>
     [DebuggerDisplay("{" + nameof(_debuggerDisplay) + ",nq}")]
+    [DebuggerStepThrough]
     public abstract class BaseChain<TDelegate, TReturnedDelegate> : IChain where TDelegate : class where TReturnedDelegate : class {
         /// holds the names of delegates called via <see cref="NameScript"/>
         private readonly SafeDictionary<string, Delegate> _nameDelegates = new SafeDictionary<string, Delegate>();
