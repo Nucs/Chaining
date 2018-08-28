@@ -39,6 +39,12 @@ namespace nucs.Chaining {
 
         public static InputChain<TInput> Build(CRE<TInput> func) { return new InputChain<TInput>(func); }
 
+        public static InputChain<TInput> Build(TInput initialInput, CRE<TInput> func) {
+            var ret = new InputChain<TInput>(func);
+            ret._reference.Value = initialInput;
+            return ret;
+        }
+
         public InputChain(CRE<TInput> script) : base(script) { }
 
         protected InputChain() { }
