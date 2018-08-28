@@ -58,7 +58,9 @@
   <ItemGroup>
     <None Include="App.config" />
     <Compile Include="Wiki\Terminology.Callstack.cs" />
+    <Compile Include="Wiki\Terminology.Script_Naming.cs" />
     <Compile Include="Wiki\Terminology.Initialization.Script.cs" />
+    <Compile Include="Wiki\Terminology.Condition_Script.cs" />
     <Compile Include="Wiki\Terminology.Pulse.cs" />
     <Compile Include="Wiki\Terminology.Chain.cs" />
     <None Include="packages.config" />

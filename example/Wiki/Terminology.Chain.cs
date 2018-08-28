@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using nucs.Chaining.Extensions;
 
 namespace nucs.Chaining.Example.Wiki {
     [TestClass]
@@ -12,17 +13,22 @@ namespace nucs.Chaining.Example.Wiki {
                         return c.Complete(); //third method returned.
                     };
                 });
+
+            chain.PulseToCompletion();
+            chain.StackSize.Should().Be(2);
+            chain.Completed.Should().BeTrue();
         }
 
+        [TestMethod]
         public void X1() {
             int i = 0;
-            var c = Chain.Build(chain => {
+            var chain = Chain.Build(c => {
                 i++;
-                return chain.Complete();
+                return c.Complete();
             });
 
-            c.Pulse();
-            c.Completed.Should().BeTrue();
+            chain.Pulse();
+            chain.Completed.Should().BeTrue();
             i.Should().Be(1);
         }
     }
