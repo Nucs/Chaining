@@ -23,26 +23,16 @@ namespace nucs.Chaining {
     public abstract class BaseChain<TDelegate, TReturnedDelegate> : IChain where TDelegate : class where TReturnedDelegate : class {
         /// holds the names of delegates called via <see cref="NameScript"/>
         private readonly SafeDictionary<string, Delegate> _nameDelegates = new SafeDictionary<string, Delegate>();
-
         /// The current running script.
         private Delegate _currentScript => _stagesStack.Peek();
-
         /// Flags to continue immediatly to <see cref="_currentScript"/>
         private bool _immediateContinueRequested = false;
-
         private bool _backwardsRequested;
-
         /// The previous script to <see cref="_currentScript"/>, if no previous script, it'll be equal to <see cref="_currentScript"/>
         private Stack<Delegate> _stagesStack { get; } = new Stack<Delegate>();
-
         /// cancellation for dropping out when calling <see cref="Cancel"/>
         private readonly CancellationTokenSource _source;
-
         private TDelegate _initialScript;
-        private Delegate _empty;
-        private Delegate _repeat;
-        private Delegate _initialScript1;
-
 
         #region Events
 
@@ -55,6 +45,7 @@ namespace nucs.Chaining {
         ///     Fired right before execution of the current chain command.
         /// </summary>
         public event OnBeforeCallingScriptHandler BeforeCallingScript;
+
         /// <summary>
         ///     Fired right after execution of the current chain command.
         /// </summary>
@@ -89,12 +80,12 @@ namespace nucs.Chaining {
         /// <summary>
         ///     A <see cref="TDelegate"/> that returns emptry results which signify to repeat current script.
         /// </summary>
-        Delegate IChain.Empty => _empty;
+        Delegate IChain.Empty => (Delegate) (object) Empty;
 
         /// <summary>
         ///     A <see cref="TDelegate"/> that returns emptry results which signify to repeat current script.
         /// </summary>
-        Delegate IChain.Repeat => _repeat;
+        Delegate IChain.Repeat => (Delegate) (object) Repeat;
 
         /// <summary>
         ///     A <see cref="TDelegate"/> that returns emptry results which signify to repeat current script on the next pulse.
@@ -115,7 +106,7 @@ namespace nucs.Chaining {
         /// <summary>
         ///     The script that was passed via constructor.
         /// </summary>
-        Delegate IChain.InitialScript => _initialScript1;
+        Delegate IChain.InitialScript => (Delegate) (object) _initialScript;
 
         /// <summary>
         ///     The script that was passed via constructor.
@@ -252,7 +243,7 @@ namespace nucs.Chaining {
             if (@delegate == null)
                 throw new ArgumentException($"Could not find script corresponding to name '{scriptName}'.");
 
-            return Continue((TReturnedDelegate)(object) @delegate);
+            return Continue((TReturnedDelegate) (object) @delegate);
         }
 
         /// <summary>
@@ -267,7 +258,7 @@ namespace nucs.Chaining {
             if (@delegate == null)
                 throw new ArgumentException($"Could not find script corresponding to name '{scriptName}'.");
 
-            return (TReturnedDelegate)(object) @delegate;
+            return (TReturnedDelegate) (object) @delegate;
         }
 
         /// <summary>
@@ -395,7 +386,7 @@ namespace nucs.Chaining {
                             throw;
                         }
 
-                        AfterCallingScript?.Invoke(_currentScript, (Delegate)(object)next);
+                        AfterCallingScript?.Invoke(_currentScript, (Delegate) (object) next);
                         lock (_source)
                             if (_source.IsCancellationRequested) {
                                 State = ChainState.Cancelled;
@@ -451,7 +442,7 @@ namespace nucs.Chaining {
 
             Failed = false;
             Completed = false;
-             
+
             //todo when using Bind event from inside of a script, make sure to unregister it when the script is Reset.
 
             _nameDelegates.Clear();
@@ -474,12 +465,11 @@ namespace nucs.Chaining {
 
         #region Dirty Interface Delegating
 
-
         /// <summary>
         ///     Marks this chain as completed.
         /// </summary>
         /// <param name="ignoreResetting">If <see cref="BaseChain{TDelegate,Delegate}.AutoResetting"/> enabled, should it be ignored?</param>
-        Delegate IChain.Complete(bool ignoreResetting) { return (Delegate)(object)Complete(ignoreResetting); }
+        Delegate IChain.Complete(bool ignoreResetting) { return (Delegate) (object) Complete(ignoreResetting); }
 
         /// <summary>
         ///     Basicly does a reset that will be accepted on the next pulse.
@@ -491,21 +481,21 @@ namespace nucs.Chaining {
         ///     Basicly does a reset and immediatly continues to the chain that is set after the reset.
         /// </summary>
         /// <returns></returns>
-        Delegate IChain.RestartContinue() { return (Delegate)(object) RestartContinue(); }
+        Delegate IChain.RestartContinue() { return (Delegate) (object) RestartContinue(); }
 
         /// if AutoResetting enabled, won't restart and <see cref="BaseChain{TDelegate,Delegate}.Failed"/> is marked true. (Note that <see cref="BaseChain{TDelegate,Delegate}.Complete"/> is also marked true).
-        Delegate IChain.Fail() { return (Delegate)(object)Fail(); }
+        Delegate IChain.Fail() { return (Delegate) (object) Fail(); }
 
         /// <summary>
         ///     Continue immediatly to <paramref name="toScript"/>. note: It is included into the history stack.
         /// </summary>
         /// <param name="toScript">The script to continue to without waiting to next pulse.</param>
-        Delegate IChain.Continue(Delegate toScript) { return (Delegate)(object)Continue((TReturnedDelegate)(object)toScript); }
+        Delegate IChain.Continue(Delegate toScript) { return (Delegate) (object) Continue((TReturnedDelegate) (object) toScript); }
 
         /// <summary>
         ///     Similar to continue in a loop, Reenters current script immediatly. note: Doesn't include into the history stack.
         /// </summary>
-        Delegate IChain.Continue() { return (Delegate)(object)Continue(); }
+        Delegate IChain.Continue() { return (Delegate) (object) Continue(); }
 
         /// <summary>
         ///     Falls back to previous script/script.
@@ -513,28 +503,28 @@ namespace nucs.Chaining {
         /// <param name="times">How many stacks to fall.</param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException">When <paramref name="times"/> exceeds the stacks</exception>
-        Delegate IChain.Backwards(int times) { return (Delegate)(object)Backwards(times); }
+        Delegate IChain.Backwards(int times) { return (Delegate) (object) Backwards(times); }
 
         /// <summary>
         ///     Goes backwards immediatly without waiting for the next tick; Works similarly to <see cref="BaseChain{TDelegate,Delegate}.Backwards"/>.
         /// </summary>
         /// <param name="times"></param>
         /// <returns></returns>
-        Delegate IChain.ContinueBackwards(int times) { return (Delegate)(object)ContinueBackwards(times); }
+        Delegate IChain.ContinueBackwards(int times) { return (Delegate) (object) ContinueBackwards(times); }
 
         /// <summary>
         ///     Goes <see cref="BaseChain{TDelegate,Delegate}.Backwards"/> to the script that was named using <see cref="BaseChain{TDelegate,Delegate}.NameScript"/>.
         /// </summary>
         /// <exception cref="ArgumentException">The name is not registered or not in current script-stacktrace.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="scriptName"/> was passed null.</exception>
-        Delegate IChain.BackwardsTo(string scriptName) { return (Delegate)(object)BackwardsTo(scriptName); }
+        Delegate IChain.BackwardsTo(string scriptName) { return (Delegate) (object) BackwardsTo(scriptName); }
 
         /// <summary>
         ///     Goes <see cref="BaseChain{TDelegate,Delegate}.Backwards"/> to the script that was named using <see cref="BaseChain{TDelegate,Delegate}.NameScript"/> immediatly without waiting for the next pulse.
         /// </summary>
         /// <exception cref="ArgumentException">The name is not registered or not in current script-stacktrace.</exception>
         /// <exception cref="ArgumentNullException"><paramref name="scriptName"/> was passed null.</exception>
-        Delegate IChain.ContinueBackwardsTo(string scriptName) { return (Delegate)(object)ContinueBackwardsTo(scriptName); }
+        Delegate IChain.ContinueBackwardsTo(string scriptName) { return (Delegate) (object) ContinueBackwardsTo(scriptName); }
 
         /// <summary>
         ///     Set or override the script corresponding to the passed script name.
