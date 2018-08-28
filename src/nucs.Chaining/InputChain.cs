@@ -42,6 +42,7 @@ namespace nucs.Chaining {
         public static InputChain<TInput> Build(TInput initialInput, CRE<TInput> func) {
             var ret = new InputChain<TInput>(func);
             ret._reference.Value = initialInput;
+            ret._reference.HasChanged = true;
             return ret;
         }
 

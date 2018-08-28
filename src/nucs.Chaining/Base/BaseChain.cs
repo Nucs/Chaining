@@ -117,8 +117,7 @@ namespace nucs.Chaining {
                 _initialScript = value;
                 if (_stagesStack.Count != 0)
                     _stagesStack.Clear();
-                else
-                    _stagesStack.Push((Delegate) (object) value);
+                _stagesStack.Push((Delegate) (object) value);
             }
         }
 

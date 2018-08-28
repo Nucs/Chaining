@@ -30,7 +30,7 @@ namespace nucs.Chaining.Tests {
             var chain = InputChain<int>.Build((c, r) => {
                 return _ => c.Complete();
             });
-            
+
             chain.Pulse();
             chain.Cancel();
 
@@ -496,6 +496,24 @@ namespace nucs.Chaining.Tests {
             chain.Pulse(queue.Dequeue()); //3
             chain.Pulse(queue.Dequeue()); //4
             chain.Pulse(queue.Dequeue()); //5
+            chain.Completed.Should().BeTrue();
+        }
+
+        [TestMethod]
+        [Timeout(5000)]
+        public void InitialInputViaConstructor() {
+            var chain = InputChain<string>.Build("kek", (c, reference) => {
+                reference.Value.Should().Be("kek");
+                reference.HasChanged.Should().BeTrue();
+                return _ => {
+                    reference.Value.Should().Be("kek");
+                    reference.HasChanged.Should().BeFalse();
+                    return c.Complete();
+                };
+            });
+            //run
+            chain.Pulse(); //pulse without input.
+            chain.Pulse(); //enter stage 2.
             chain.Completed.Should().BeTrue();
         }
     }
