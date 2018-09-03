@@ -24,15 +24,23 @@ namespace nucs.Chaining {
     public abstract class BaseChain<TDelegate, TReturnedDelegate> : IChain where TDelegate : class where TReturnedDelegate : class {
         /// holds the names of delegates called via <see cref="NameScript"/>
         private readonly SafeDictionary<string, Delegate> _nameDelegates = new SafeDictionary<string, Delegate>();
+
+        private readonly List<string> _uniqueEventRegisteration = new List<string>();
+
         /// The current running script.
         private Delegate _currentScript => _stagesStack.Peek();
+
         /// Flags to continue immediatly to <see cref="_currentScript"/>
         private bool _immediateContinueRequested = false;
+
         private bool _backwardsRequested;
+
         /// The previous script to <see cref="_currentScript"/>, if no previous script, it'll be equal to <see cref="_currentScript"/>
         private Stack<Delegate> _stagesStack { get; } = new Stack<Delegate>();
+
         /// cancellation for dropping out when calling <see cref="Cancel"/>
         private readonly CancellationTokenSource _source;
+
         private TDelegate _initialScript;
 
         #region Events
@@ -61,6 +69,42 @@ namespace nucs.Chaining {
         public void BindOnBeforeCallingScript(OnBeforeCallingScriptHandler script) { BeforeCallingScript += script; }
         public void BindOnAfterCallingScript(OnAfterCallingScriptHandler script) { AfterCallingScript += script; }
         public void BindOnPulse(OnPulseHandler script) { OnPulse += script; }
+
+        public void BindOnScriptChanged(string id, OnScriptChangedHandler script) {
+            var key = $"{nameof(BindOnScriptChanged)}{id}";
+            if (_uniqueEventRegisteration.Contains(key))
+                return;
+            _uniqueEventRegisteration.Add(key);
+
+            ScriptChanged += script;
+        }
+
+        public void BindOnBeforeCallingScript(string id, OnBeforeCallingScriptHandler script) {
+            var key = $"{nameof(BindOnBeforeCallingScript)}{id}";
+            if (_uniqueEventRegisteration.Contains(key))
+                return;
+            _uniqueEventRegisteration.Add(key);
+
+            BeforeCallingScript += script;
+        }
+
+        public void BindOnAfterCallingScript(string id, OnAfterCallingScriptHandler script) {
+            var key = $"{nameof(BindOnAfterCallingScript)}{id}";
+            if (_uniqueEventRegisteration.Contains(key))
+                return;
+            _uniqueEventRegisteration.Add(key);
+
+            AfterCallingScript += script;
+        }
+
+        public void BindOnPulse(string id, OnPulseHandler script) {
+            var key = $"{nameof(BindOnPulse)}{id}";
+            if (_uniqueEventRegisteration.Contains(key))
+                return;
+
+            _uniqueEventRegisteration.Add(key);
+            OnPulse += script;
+        }
 
         #endregion
 
@@ -142,7 +186,12 @@ namespace nucs.Chaining {
         /// <summary>
         ///     Has the script marked failed via <see cref="Fail"/>? note: Completed does not mean it was successful.
         /// </summary>
-        public bool Failed { get; private set; }
+        public bool Failed { get; protected set; }
+
+        /// <summary>
+        ///     When <see cref="Failed"/> is true, this will contain the reason if passed.
+        /// </summary>
+        public string FailReason { get; protected set; }
 
         /// <summary>
         ///     Is the script that is running now or will be run now is <see cref="InitialScript"/>.
@@ -211,6 +260,16 @@ namespace nucs.Chaining {
 
         /// if AutoResetting enabled, won't restart and <see cref="Failed"/> is marked true. (Note that <see cref="Complete"/> is also marked true).
         public TReturnedDelegate Fail() {
+            FailReason = null;
+            Completed = true;
+            Failed = true;
+            State = ChainState.Failed;
+            return NullReturningDelegate;
+        }
+
+        /// if AutoResetting enabled, won't restart and <see cref="Failed"/> is marked true. (Note that <see cref="Complete"/> is also marked true).
+        public TReturnedDelegate Fail(string reason) {
+            FailReason = reason;
             Completed = true;
             Failed = true;
             State = ChainState.Failed;
@@ -355,6 +414,17 @@ namespace nucs.Chaining {
         }
 
         /// <summary>
+        ///     Set or override <paramref name="script"/> to <paramref name="name"/>.
+        /// </summary>
+        /// <exception cref="ArgumentNullException"><paramref name="name"/> was passed null.</exception>
+        public BaseChain<TDelegate, TReturnedDelegate> NameScript(string name, TReturnedDelegate script) {
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+            _nameDelegates[name] = (Delegate) (object) script;
+            return this;
+        }
+
+        /// <summary>
         ///     Enter into the chain once.
         /// </summary>
         /// <remarks>Will enter the current chain command once.</remarks>
@@ -442,6 +512,7 @@ namespace nucs.Chaining {
 
             Failed = false;
             Completed = false;
+            FailReason = null;
 
             //todo when using Bind event from inside of a script, make sure to unregister it when the script is Reset.
 

@@ -2,10 +2,11 @@
 
   <PropertyGroup>
     <TargetFrameworks>net4;netstandard1.2</TargetFrameworks>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <LangVersion>latest</LangVersion>
+    <LangVersion>7.3</LangVersion>
     <DefineConstants>TRACE;DEBUG;CSHARP73;NETSTANDARD2_0</DefineConstants>
   </PropertyGroup>
 

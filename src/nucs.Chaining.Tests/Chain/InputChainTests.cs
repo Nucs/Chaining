@@ -427,13 +427,18 @@ namespace nucs.Chaining.Tests {
             queue.Enqueue(5);
             var chain = InputChain<int>.Build((c, r) => {
                 r.Value.Should().Be(1);
+                r.HasChanged.Should().BeTrue();
                 return _ => {
+                    r.HasChanged.Should().BeTrue();
                     r.Value.Should().Be(2);
                     return __ => {
+                        r.HasChanged.Should().BeTrue();
                         r.Value.Should().Be(3);
                         return ___ => {
+                            r.HasChanged.Should().BeTrue();
                             r.Value.Should().Be(4);
                             return ____ => {
+                                r.HasChanged.Should().BeTrue();
                                 r.Value.Should().Be(5);
                                 return c.Complete();
                             };
